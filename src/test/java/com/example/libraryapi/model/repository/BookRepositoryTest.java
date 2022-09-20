@@ -1,0 +1,63 @@
+package com.example.libraryapi.model.repository;
+
+import com.example.libraryapi.model.entity.Book;
+import com.example.libraryapi.model.repositoy.BookRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+@ExtendWith(SpringExtension.class)
+@ActiveProfiles("test")
+@DataJpaTest
+public class BookRepositoryTest {
+
+    @Autowired
+    TestEntityManager entityManager;
+
+    @Autowired
+    BookRepository repository;
+
+    @Test
+    @DisplayName("deve retornar verdadeiro quando existir o livro na base com o isbn informado")
+    public void returnTrueWhenIsbnExists(){
+        //CENARIO
+        String isbn = "123";
+        Book book = Book.builder()
+                .author("Fulano")
+                .title("As Aventuras")
+                .isbn(isbn).build();
+
+        entityManager.persist(book);
+
+        //EXECUCAO
+
+        boolean exists = repository.existsByIsbn(isbn);
+
+        //VERIFICACAO
+
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    @DisplayName("deve retornar falso quando nao existir o livro na base com o isbn informado")
+    public void returnFalseWhenIsbnDoesntExists(){
+        //CENARIO
+        String isbn = "123";
+        //EXECUCAO
+
+        boolean exists = repository.existsByIsbn(isbn);
+
+        //VERIFICACAO
+
+        assertThat(exists).isFalse();
+    }
+
+
+}
