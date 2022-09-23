@@ -69,7 +69,6 @@ public class BookRepositoryTest {
         //VERIFICACAO
         assertThat(foundBook.isPresent()).isTrue();
     }
-
     private static Book createNewBook(String isbn) {
         return Book.builder()
                 .author("Fulano")
