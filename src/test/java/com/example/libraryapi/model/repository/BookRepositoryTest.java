@@ -19,28 +19,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ActiveProfiles("test")
 @DataJpaTest
 public class BookRepositoryTest {
-
     @Autowired
     TestEntityManager entityManager;
-
     @Autowired
     BookRepository repository;
-
     @Test
     @DisplayName("deve retornar verdadeiro quando existir o livro na base com o isbn informado")
     public void returnTrueWhenIsbnExists(){
         //CENARIO
         String isbn = "123";
         Book book = createNewBook(isbn);
-
         entityManager.persist(book);
-
         //EXECUCAO
-
         boolean exists = repository.existsByIsbn(isbn);
-
         //VERIFICACAO
-
         assertThat(exists).isTrue();
     }
     @Test
@@ -49,11 +41,8 @@ public class BookRepositoryTest {
         //CENARIO
         String isbn = "123";
         //EXECUCAO
-
         boolean exists = repository.existsByIsbn(isbn);
-
         //VERIFICACAO
-
         assertThat(exists).isFalse();
     }
     @Test
@@ -62,19 +51,26 @@ public class BookRepositoryTest {
         //CENARIO
         Book book = createNewBook("123");
         entityManager.persist(book);
-
         //EXECUCAO
         Optional<Book> foundBook = repository.findById(book.getId());
-
         //VERIFICACAO
         assertThat(foundBook.isPresent()).isTrue();
     }
+    @Test
+    @DisplayName("Deve salvar um livro")
+    public void saveBookTest(){
+        //CENARIO
+        Book book = createNewBook("123");
+        //EXECUCAO
+        Book savedBook = repository.save(book);
+        //VERIFICACAO
+        assertThat(savedBook.getId()).isNotNull();
+    }
+
     private static Book createNewBook(String isbn) {
         return Book.builder()
                 .author("Fulano")
                 .title("As Aventuras")
                 .isbn(isbn).build();
     }
-
-
 }
