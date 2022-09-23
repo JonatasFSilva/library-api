@@ -66,7 +66,6 @@ public class BookRepositoryTest {
         //VERIFICACAO
         assertThat(savedBook.getId()).isNotNull();
     }
-
     @Test
     @DisplayName("Deve deletar um livro")
     public void deleteBookTest(){
