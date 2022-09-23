@@ -102,7 +102,6 @@ public class BookServiceTest {
         //VERIFICACOES
         assertThat(book.isPresent()).isFalse();
     }
-
     @Test
     @DisplayName("Deve detelar um livro pelo Id")
     public void deleteBookTest(){
