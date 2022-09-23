@@ -30,7 +30,6 @@ public class BookServiceTest {
     public void setUp(){
         this.service = new BookServiceImpl(repository);
     }
-
     @Test
     @DisplayName("deve salvar um livro")
     public void saveBookTest(){
@@ -53,9 +52,7 @@ public class BookServiceTest {
         assertThat(savedBook.getIsbn()).isEqualTo("123");
         assertThat(savedBook.getTitle()).isEqualTo("As Aventuras");
         assertThat(savedBook.getAuthor()).isEqualTo("Fulano");
-
     }
-
     @Test
     @DisplayName("deve lancar erro de negocio ao tentar salvar um livro com isbn duplicado")
     public void shoulNotSaveABookWithIsbnDuplicateISBNTest(){
@@ -91,9 +88,7 @@ public class BookServiceTest {
         assertThat(foundBook.get().getAuthor()).isEqualTo(book.getAuthor());
         assertThat(foundBook.get().getTitle()).isEqualTo(book.getTitle());
         assertThat(foundBook.get().getIsbn()).isEqualTo(book.getIsbn());
-
     }
-
     @Test
     @DisplayName("Deve retornar vazio obter um livro por Id quando ele nao existe na base")
     public void bookNotFoundByIdTest(){
@@ -106,7 +101,20 @@ public class BookServiceTest {
 
         //VERIFICACOES
         assertThat(book.isPresent()).isFalse();
+    }
 
+    @Test
+    @DisplayName("Deve detelar um livro pelo Id")
+    public void deleteBookTest(){
+        //CENARIO
+        Book book = Book.builder()
+                .id(1L)
+                .build();
+        //EXECUCAO
+        service.delete(book);
+
+        //VERIFICACAO
+        Mockito.verify(repository, Mockito.times(1)).delete(book);
     }
 
     private static Book createValidBook() {
