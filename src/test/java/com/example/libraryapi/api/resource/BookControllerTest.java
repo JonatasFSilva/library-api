@@ -241,7 +241,6 @@ public class BookControllerTest {
         mvc.perform(request)
                 .andExpect(status().isNotFound());
     }
-
     @Test
     @DisplayName("Deve filtrar livros")
     public void findBooksTest() throws Exception{
@@ -271,9 +270,7 @@ public class BookControllerTest {
                 .andExpect(jsonPath("pageable.pageSize").value(100))
                 .andExpect(jsonPath("pageable.pageNumber").value(0))
         ;
-
     }
-
     private BookDTO createNewBook() {
         return BookDTO
                 .builder()
