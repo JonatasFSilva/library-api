@@ -245,7 +245,7 @@ public class BookControllerTest {
     @Test
     @DisplayName("Deve filtrar livros")
     public void findBooksTest() throws Exception{
-
+        //CENARIO
         Long id = 1L;
         Book book = Book.builder()
                 .id(id).author(createNewBook().getAuthor())
@@ -259,13 +259,14 @@ public class BookControllerTest {
         String queryString = String.format("?title=%s&author=%s&page=0&size=100",
                 book.getTitle(), book.getAuthor());
 
+        //EXECUCAO
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .get(BOOK_API.concat(queryString))
                 .accept(MediaType.APPLICATION_JSON);
 
         mvc.perform(request)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("content", Matchers.hasSize(1)))
+                .andExpect(jsonPath("content", Matchers.hasSize(1))) // REGISTROS
                 .andExpect(jsonPath("totalElements").value(1))
                 .andExpect(jsonPath("pageable.pageSize").value(100))
                 .andExpect(jsonPath("pageable.pageNumber").value(0))
