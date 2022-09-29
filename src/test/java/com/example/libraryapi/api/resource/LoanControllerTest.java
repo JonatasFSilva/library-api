@@ -77,7 +77,7 @@ public class LoanControllerTest {
 
     @Test
     @DisplayName("Deve retornar erro ao tentar fazer imprestimo de livro inexistente")
-    public void invalidIsbbnLoanTest()throws Exception{
+    public void invalidIsbnLoanTest()throws Exception{
         LoanDTO dto = LoanDTO.builder()
                 .isbn("123")
                 .customer("Fulano").build();
