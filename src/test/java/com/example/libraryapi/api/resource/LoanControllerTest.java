@@ -6,6 +6,7 @@ import com.example.libraryapi.model.entity.Book;
 import com.example.libraryapi.service.BookService;
 import com.example.libraryapi.service.LoanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,7 +77,23 @@ public class LoanControllerTest {
 
     @Test
     @DisplayName("Deve retornar erro ao tentar fazer imprestimo de livro inexistente")
-    public void invalidIsbbnLoanTest(){
+    public void invalidIsbbnLoanTest()throws Exception{
+        LoanDTO dto = LoanDTO.builder()
+                .isbn("123")
+                .customer("Fulano").build();
+        String json = new ObjectMapper().writeValueAsString(dto);
+        BDDMockito.given(bookService.getBookByIsbn("123"))
+                .willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post(LOAN_API)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors", Matchers.hasSize(1)))
+                .andExpect(jsonPath("errors[0]").value("Book not found passed isbn"));
 
     }
 }
