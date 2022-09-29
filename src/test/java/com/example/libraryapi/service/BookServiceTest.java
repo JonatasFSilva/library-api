@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)/* CRIA UM MINI CONTEXTO (DE INJECAO DE DEPENDENCIA COM A CLASSES QUE SERAO DEFINIDAS )PARA RODAR O TESTE*/
 @ActiveProfiles("test")/* RODA OS TESTE COM PERFIL DE TEST, PODENDO REALIZAR ALGUMAS CONFIGURACOES QUE VAO RODAR APENAS NO AMBIENTE DE TESTE*/
@@ -37,13 +38,13 @@ public class BookServiceTest {
         this.service = new BookServiceImpl(repository);
     }
     @Test
-    @DisplayName("deve salvar um livro")
+    @DisplayName("Deve salvar um livro")
     public void saveBookTest(){
         //CENARIO
         Book book = createValidBook();
-        Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(false);
+        when(repository.existsByIsbn(Mockito.anyString())).thenReturn(false);
 
-        Mockito.when(repository.save(book)).thenReturn(Book.builder()
+        when(repository.save(book)).thenReturn(Book.builder()
                 .id(1L)
                 .author("Fulano")
                 .title("As Aventuras")
@@ -60,11 +61,11 @@ public class BookServiceTest {
         assertThat(savedBook.getAuthor()).isEqualTo("Fulano");
     }
     @Test
-    @DisplayName("deve lancar erro de negocio ao tentar salvar um livro com isbn duplicado")
+    @DisplayName("Deve lancar erro de negocio ao tentar salvar um livro com isbn duplicado")
     public void shoulNotSaveABookWithIsbnDuplicateISBNTest(){
         //CENARIO
         Book book = createValidBook();
-        Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(true);
+        when(repository.existsByIsbn(Mockito.anyString())).thenReturn(true);
 
         //EXECUCAO
         Throwable exception = Assertions.catchThrowable(() ->service.save(book));
@@ -83,7 +84,7 @@ public class BookServiceTest {
 
         Book book = createValidBook();
         book.setId(id);
-        Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
+        when(repository.findById(id)).thenReturn(Optional.of(book));
 
         //EXECUCAO
         Optional<Book> foundBook = service.getById(id);
@@ -100,7 +101,7 @@ public class BookServiceTest {
     public void bookNotFoundByIdTest(){
         Long id = 1L;
 
-        Mockito.when(repository.findById(id)).thenReturn(Optional.empty());
+        when(repository.findById(id)).thenReturn(Optional.empty());
 
         //EXECUCAO
         Optional<Book> book = service.getById(id);
@@ -150,7 +151,7 @@ public class BookServiceTest {
         //simulacao do livro
         Book updatedBook = createValidBook();
         updatedBook.setId(id);
-        Mockito.when(repository.save(updatingBook)).thenReturn(updatedBook);
+        when(repository.save(updatingBook)).thenReturn(updatedBook);
         //EXECUCAO
         Book book = service.update(updatingBook);
 
@@ -169,7 +170,7 @@ public class BookServiceTest {
         PageRequest pageRequest = PageRequest.of(0,10);
         List<Book> lista = Arrays.asList(book);
         Page<Book> page = new PageImpl<Book>(lista,pageRequest , 1);
-        Mockito.when(repository.
+        when(repository.
                 findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class)))
                 .thenReturn(page);
         //EXECUCAO
@@ -179,6 +180,25 @@ public class BookServiceTest {
         assertThat(result.getContent()).isEqualTo(lista);
         assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
         assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+    }
+
+    @Test
+    @DisplayName("Deve obter um livro pelo isbn")
+    public void getBookByIsbnTest(){
+        String isbn = "1230";
+        when(repository.findByIsbn(isbn))
+                .thenReturn(Optional.of(Book.builder()
+                        .id(1L).isbn(isbn).build()));
+
+        Optional<Book> book = service.getBookByIsbn(isbn);
+
+        assertThat(book.isPresent()).isTrue();
+        assertThat(book.get().getId()).isEqualTo(1L);
+        assertThat(book.get().getIsbn()).isEqualTo(isbn);
+
+        verify(repository, times(1)).findByIsbn(isbn);
+
+
     }
     private static Book createValidBook() {
         return Book.builder()
